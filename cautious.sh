@@ -24,6 +24,6 @@ do
     echo "  stdout:"
     cat "$function.stdout.txt" | sed 's/^/    /'
     echo "  stderr:"
-    cat "$function.stderr.txt" | sed 's/^/    /'
+    cat "$function.stderr.txt" | sed 's/^/    /' | sed 's|./"\$function"$||'
   fi
 done
