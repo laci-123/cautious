@@ -12,14 +12,19 @@ function print_c_file() {
   echo "}"                                     >> "$1"
 }
 
+declare -i pass_count=0
+declare -i fail_count=0
+
 for function in $(nm "$object_file" | grep -o "ctest_[a-zA-Z-]*")
 do
   print_c_file "$function.c"
   cc "$function.c" main.o -o "$function"
   if { ./"$function"; } > "$function.stdout.txt" 2> "$function.stderr.txt"
   then
+    pass_count+=1
     echo "[PASS] $function"
   else
+    fail_count+=1
     echo "[FAIL] $function"
     echo "  stdout:"
     cat "$function.stdout.txt" | sed 's/^/    /'
@@ -27,3 +32,7 @@ do
     cat "$function.stderr.txt" | sed 's/^/    /' | sed 's|./"\$function"$||'
   fi
 done
+
+echo ""
+echo ""
+echo "passed: $pass_count failed: $fail_count"
