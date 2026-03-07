@@ -24,7 +24,7 @@ declare -i fail_count=0
 for function in $(nm "$object_file" | grep -o "ctest_[a-zA-Z-]*")
 do
   print_c_file "$function.c"
-  cc "$function.c" main.o -o "$function"
+  cc "$function.c" "$object_file" -o "$function"
   if { ./"$function"; } > "$function.stdout.txt" 2> "$function.stderr.txt"
   then
     pass_count+=1
