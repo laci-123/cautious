@@ -1,7 +1,5 @@
 #!/usr/bin/sh
 
-object_file="$1"
-
 BOLD='\033[1m'
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -17,6 +15,20 @@ function print_c_file() {
   echo "    return 0;"                         >> "$1"
   echo "}"                                     >> "$1"
 }
+
+function print_usage() {
+  echo "Usage:"
+  echo ""
+  echo "$0 [objfile]"  
+}
+
+if [ "$#" -lt 1 ]
+then
+  print_usage
+  exit 1
+fi
+
+object_file="$1"
 
 tmp_dir=$(mktemp --directory)
 
