@@ -18,14 +18,16 @@ function print_c_file() {
   echo "}"                                     >> "$1"
 }
 
+tmp_dir=$(mktemp --directory)
+
 declare -i pass_count=0
 declare -i fail_count=0
 
 for function in $(nm "$object_file" | grep -o "ctest_[a-zA-Z-]*")
 do
-  print_c_file "$function.c"
-  cc "$function.c" "$object_file" -o "$function"
-  if { ./"$function"; } > "$function.stdout.txt" 2> "$function.stderr.txt"
+  print_c_file "$tmp_dir/$function.c"
+  cc "$tmp_dir/$function.c" "$object_file" -o "$tmp_dir/$function"
+  if { "$tmp_dir/$function"; } > "$tmp_dir/$function.stdout.txt" 2> "$tmp_dir/$function.stderr.txt"
   then
     pass_count+=1
     echo -e "${BLUE}${BOLD}[${GREEN}${BOLD}PASS${BLUE}${BOLD}] $function${RESET}"
@@ -33,12 +35,14 @@ do
     fail_count+=1
     echo -e "${BLUE}${BOLD}[${RED}${BOLD}FAIL${BLUE}${BOLD}] $function${RESET}"
     echo "  stdout:"
-    cat "$function.stdout.txt" | sed 's/^/    /'
+    cat "$tmp_dir/$function.stdout.txt" | sed 's/^/    /'
     echo "  stderr:"
-    cat "$function.stderr.txt" | sed 's/^/    /' | sed 's|./"\$function"$||' | grep --color=always '^\|Assertion .* failed'
+    cat "$tmp_dir/$function.stderr.txt" | sed 's/^/    /' | sed 's|"\$tmp_dir/\$function"$||' | grep --color=always '^\|Assertion .* failed'
   fi
 done
 
 echo ""
 echo ""
 echo -e "${BLUE}${BOLD}passed: ${GREEN}${BOLD}$pass_count ${BLUE}${BOLD}failed: ${RED}${BOLD}$fail_count$RESET"
+
+rm -rf "$tmp_dir"
