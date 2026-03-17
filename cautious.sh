@@ -18,17 +18,26 @@ function print_c_file() {
 
 function print_usage() {
   echo "Usage:"
-  echo ""
   echo "$0 [objfile]"  
 }
 
+
 if [ "$#" -lt 1 ]
 then
+  echo "No arguments provided"
+  echo ""
   print_usage
   exit 1
 fi
 
 object_file="$1"
+if ! nm "$object_file" > /dev/null 2>&1
+then
+  echo "$object_file is not an object file"
+  echo ""
+  print_usage
+  exit 1
+fi
 
 tmp_dir=$(mktemp --directory)
 
