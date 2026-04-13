@@ -44,7 +44,7 @@ tmp_dir=$(mktemp --directory)
 declare -i pass_count=0
 declare -i fail_count=0
 
-for function in $(nm "$object_file" | grep -o "ctest_[a-zA-Z-]*")
+for function in $(nm "$object_file" | grep -o "ctest_[a-zA-Z_]*")
 do
   print_c_file "$tmp_dir/$function.c"
   cc "$tmp_dir/$function.c" "$object_file" -o "$tmp_dir/$function"
