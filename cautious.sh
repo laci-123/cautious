@@ -46,15 +46,16 @@ declare -i fail_count=0
 
 for function in $(nm "$object_file" | grep -o "ctest_[a-zA-Z_]*")
 do
+  name=$(echo $function | sed 's/ctest_//')
   print_c_file "$tmp_dir/$function.c"
   cc "$tmp_dir/$function.c" "$object_file" -o "$tmp_dir/$function"
   if { "$tmp_dir/$function"; } > "$tmp_dir/$function.stdout.txt" 2> "$tmp_dir/$function.stderr.txt"
   then
     pass_count+=1
-    echo -e "${BLUE}${BOLD}[${GREEN}${BOLD}PASS${BLUE}${BOLD}] $function${RESET}"
+    echo -e "${BLUE}${BOLD}[${GREEN}${BOLD}PASS${BLUE}${BOLD}] $name${RESET}"
   else
     fail_count+=1
-    echo -e "${BLUE}${BOLD}[${RED}${BOLD}FAIL${BLUE}${BOLD}] $function${RESET}"
+    echo -e "${BLUE}${BOLD}[${RED}${BOLD}FAIL${BLUE}${BOLD}] $name${RESET}"
     echo "  stdout:"
     cat "$tmp_dir/$function.stdout.txt" | sed 's/^/    /'
     echo "  stderr:"
@@ -67,3 +68,4 @@ echo ""
 echo -e "${BLUE}${BOLD}passed: ${GREEN}${BOLD}$pass_count ${BLUE}${BOLD}failed: ${RED}${BOLD}$fail_count$RESET"
 
 rm -rf "$tmp_dir"
+
